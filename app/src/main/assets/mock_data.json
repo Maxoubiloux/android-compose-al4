@@ -1,0 +1,85 @@
+{
+  "transactions": [
+    {
+      "id": "1",
+      "title": "Salaire",
+      "amount": 2500.00,
+      "date": "2025-01-31T12:00:00",
+      "category": {
+        "id": 5,
+        "name": "Salaire",
+        "icon": "account_balance_wallet",
+        "color": "#FFEEAD"
+      },
+      "type": "INCOME"
+    },
+    {
+      "id": "2",
+      "title": "Épicerie",
+      "amount": -85.75,
+      "date": "2025-02-15T18:30:00",
+      "category": {
+        "id": 1,
+        "name": "Nourriture",
+        "icon": "restaurant",
+        "color": "#FF6B6B"
+      },
+      "type": "EXPENSE"
+    },
+    {
+      "id": "3",
+      "title": "Essence",
+      "amount": -45.20,
+      "date": "2025-02-16T09:15:00",
+      "category": {
+        "id": 2,
+        "name": "Transport",
+        "icon": "directions_car",
+        "color": "#4ECDC4"
+      },
+      "type": "EXPENSE"
+    },
+    {
+      "id": "4",
+      "title": "Cadeau d'anniversaire",
+      "amount": -120.00,
+      "date": "2025-02-18T14:20:00",
+      "category": {
+        "id": 3,
+        "name": "Shopping",
+        "icon": "shopping_bag",
+        "color": "#45B7D1"
+      },
+      "type": "EXPENSE"
+    },
+    {
+      "id": "5",
+      "title": "Remboursement",
+      "amount": 35.50,
+      "date": "2025-02-20T16:45:00",
+      "category": {
+        "id": 6,
+        "name": "Autre",
+        "icon": "more_horiz",
+        "color": "#FFD166"
+      },
+      "type": "INCOME"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "user123",
+      "name": "Jean Dupont",
+      "email": "jean.dupont@example.com",
+      "phone": "+33612345678",
+      "balance": 2784.55,
+      "accountNumber": "FR76 3000 1007 1600 0000 0000 123"
+    }
+  ],
+  "users": [
+    {
+      "email": "jean.dupont@example.com",
+      "password": "demo123"
+    }
+  ]
+}
