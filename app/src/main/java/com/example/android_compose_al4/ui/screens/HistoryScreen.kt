@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -24,7 +25,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HistoryScreen(viewModel: BankViewModel) {
+fun HistoryScreen(
+    viewModel: BankViewModel,
+    onBackClick: () -> Unit = {}
+) {
     val uiState = viewModel.uiState.value
     val transactions = uiState.transactions
     
@@ -50,6 +54,18 @@ fun HistoryScreen(viewModel: BankViewModel) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        TopAppBar(
+            title = { Text("Historique des transactions") },
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Retour"
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
         SearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it },

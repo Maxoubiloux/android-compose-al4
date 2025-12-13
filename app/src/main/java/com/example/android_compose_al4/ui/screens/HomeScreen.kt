@@ -7,7 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Payment
-import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -40,7 +40,7 @@ fun HomeScreen(
     val items = listOf(
         Screen.Home,
         Screen.Wallet,
-        Screen.History,
+        Screen.Map,
         Screen.Profile
     )
     
@@ -53,7 +53,7 @@ fun HomeScreen(
                 
                 items.forEach { screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.title) },
+                        icon = { Icon(screen.icon!!, contentDescription = screen.title) },
                         label = { Text(screen.title) },
                         selected = currentRoute == screen.route,
                         onClick = {
@@ -83,14 +83,25 @@ fun HomeScreen(
                 composable(Screen.Home.route) { 
                     HomeDashboard(
                         viewModel = viewModel,
-                        onNavigateToHistory = { navController.navigate(Screen.History.route) }
+                        onNavigateToHistory = { 
+                            navController.navigate(Screen.History.route) {
+                                launchSingleTop = true
+                            }
+                        }
                     ) 
                 }
                 composable(Screen.Wallet.route) { 
                     WalletScreen(viewModel = viewModel) 
                 }
-                composable(Screen.History.route) { 
-                    HistoryScreen(viewModel = viewModel)
+                
+                composable(Screen.History.route) {
+                    HistoryScreen(
+                        viewModel = viewModel,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+                composable(Screen.Map.route) { 
+                    MapScreen()
                 }
                 composable(Screen.Profile.route) { 
                     ProfileScreen(viewModel = viewModel)
@@ -114,18 +125,19 @@ fun HomeScreen(
 sealed class Screen(
     val route: String,
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector? = null
 ) {
     object Home : Screen("home", "Accueil", Icons.Default.Home)
     object Wallet : Screen("wallet", "Portefeuille", Icons.Default.Payment)
-    object History : Screen("history", "Historique", Icons.Default.Receipt)
+    object Map : Screen("map", "Carte", Icons.Default.Map)
     object Profile : Screen("profile", "Profil", Icons.Default.AccountCircle)
+    object History : Screen("history", "Historique")
 }
 
 sealed class UiEvent {
     object NavigateToHome : UiEvent()
     object NavigateToWallet : UiEvent()
-    object NavigateToHistory : UiEvent()
+    object NavigateToMap : UiEvent()
     object NavigateToProfile : UiEvent()
     data class ShowError(val message: String) : UiEvent()
     data class ShowMessage(val message: String) : UiEvent()
