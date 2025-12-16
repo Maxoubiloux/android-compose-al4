@@ -9,6 +9,7 @@ data class Transaction(
     val amount: Double,
     val date: String,
     val category: TransactionCategory,
+    val accountId: String? = null,
     val type: TransactionType = if (amount >= 0) TransactionType.INCOME else TransactionType.EXPENSE
 )
 
