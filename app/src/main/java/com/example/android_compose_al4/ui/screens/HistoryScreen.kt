@@ -36,17 +36,24 @@ fun HistoryScreen(
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredTransactions = remember(transactions, selectedFilter, searchQuery) {
-        transactions.filter { transaction ->
-            val matchesFilter = selectedFilter?.let { transaction.type == it } ?: true
-            val matchesSearch = transaction.title.contains(searchQuery, ignoreCase = true) ||
+        transactions
+            .asSequence()
+            .filter { transaction ->
+                val matchesFilter = selectedFilter?.let { transaction.type == it } ?: true
+                val matchesSearch = transaction.title.contains(searchQuery, ignoreCase = true) ||
                     transaction.amount.toString().contains(searchQuery, ignoreCase = true)
-            
-            matchesFilter && (searchQuery.isEmpty() || matchesSearch)
-        }.groupBy { t ->
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                .parse(t.date) ?: Date()
-            SimpleDateFormat("MMMM yyyy", Locale.FRANCE).format(date)
-        }.toList()
+
+                matchesFilter && (searchQuery.isEmpty() || matchesSearch)
+            }
+            .map { it to parseTransactionDateOrNow(it.date) }
+            .sortedByDescending { (_, date) -> date.time }
+            .groupBy(
+                keySelector = { (_, date) ->
+                    SimpleDateFormat("MMMM yyyy", Locale.FRANCE).format(date)
+                },
+                valueTransform = { (transaction, _) -> transaction }
+            )
+            .toList()
     }
     
     Column(
@@ -238,4 +245,22 @@ private fun MonthHeader(month: String) {
             color = MaterialTheme.colorScheme.primary
         )
     }
+}
+
+private fun parseTransactionDateOrNow(raw: String): Date {
+    val iso = try {
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).parse(raw)
+    } catch (_: Exception) {
+        null
+    }
+    if (iso != null) return iso
+
+    val javaDateToString = try {
+        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).parse(raw)
+    } catch (_: Exception) {
+        null
+    }
+    if (javaDateToString != null) return javaDateToString
+
+    return Date()
 }

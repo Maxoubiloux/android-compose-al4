@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -49,7 +51,7 @@ fun ProfileScreen(viewModel: BankViewModel) {
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground), // Remplacez par votre ressource d'image
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
                         contentDescription = "Photo de profil",
                         modifier = Modifier
                             .fillMaxSize()
@@ -124,7 +126,7 @@ fun ProfileScreen(viewModel: BankViewModel) {
                 )
                 
                 ProfileMenuItem(
-                    icon = Icons.Default.ReceiptLong,
+                    icon = Icons.AutoMirrored.Filled.ReceiptLong,
                     title = "Relevés et documents",
                     onClick = {}
                 )
@@ -162,7 +164,7 @@ fun ProfileScreen(viewModel: BankViewModel) {
             
             item {
                 ProfileMenuItem(
-                    icon = Icons.Default.Help,
+                    icon = Icons.AutoMirrored.Filled.Help,
                     title = "Centre d'aide",
                     onClick = {}
                 )

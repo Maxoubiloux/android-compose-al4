@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,21 +17,27 @@ import androidx.compose.ui.unit.dp
 import com.example.android_compose_al4.ui.components.TransactionItem
 import com.example.android_compose_al4.viewmodel.BankViewModel
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeDashboard(
     viewModel: BankViewModel,
-    onNavigateToHistory: () -> Unit = {}
+    onNavigateToHistory: () -> Unit = {},
+    onNavigateToTransfer: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.value
-    val user = uiState.user
     val transactions = uiState.transactions
+    val currentAccount by viewModel.currentAccount.collectAsState(initial = null)
     
     var showAddTransactionDialog by remember { mutableStateOf(false) }
     
     val onDismissDialog = { showAddTransactionDialog = false }
+
+    val sortedTransactions = remember(transactions) {
+        transactions.sortedByDescending { parseTransactionDateOrNow(it.date).time }
+    }
     
     Column(
         modifier = Modifier
@@ -53,7 +59,7 @@ fun HomeDashboard(
                 )
                 
                 Text(
-                    text = formatCurrency(user?.balance ?: 0.0),
+                    text = formatCurrency(currentAccount?.balance ?: 0.0),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -70,8 +76,8 @@ fun HomeDashboard(
                     )
                     ActionButton(
                         text = "Envoyer",
-                        icon = Icons.Default.ArrowForward,
-                        onClick = { }
+                        icon = Icons.AutoMirrored.Filled.ArrowForward,
+                        onClick = onNavigateToTransfer
                     )
                     ActionButton(
                         text = "Dépenser",
@@ -112,7 +118,7 @@ fun HomeDashboard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(transactions.take(5)) { transaction ->
+                items(sortedTransactions.take(5)) { transaction ->
                     TransactionItem(
                         transaction = transaction,
                         onTransactionClick = { }
@@ -193,4 +199,22 @@ private fun formatCurrency(amount: Double): String {
     format.maximumFractionDigits = 2
     format.currency = Currency.getInstance("EUR")
     return format.format(amount)
+}
+
+private fun parseTransactionDateOrNow(raw: String): Date {
+    val iso = try {
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).parse(raw)
+    } catch (_: Exception) {
+        null
+    }
+    if (iso != null) return iso
+
+    val javaDateToString = try {
+        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).parse(raw)
+    } catch (_: Exception) {
+        null
+    }
+    if (javaDateToString != null) return javaDateToString
+
+    return Date()
 }

@@ -1,6 +1,7 @@
 package com.example.android_compose_al4.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,41 +15,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.example.android_compose_al4.data.model.BankAccount
 import com.example.android_compose_al4.viewmodel.BankViewModel
-import java.text.NumberFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WalletScreen(viewModel: BankViewModel) {
-    val uiState = viewModel.uiState.value
-    val user = uiState.user
-    
+fun WalletScreen(
+    viewModel: BankViewModel,
+    onAccountClick: (BankAccount) -> Unit = {}
+) {
+    val accounts by viewModel.accounts.collectAsState(initial = emptyList())
+    val currentAccount by viewModel.currentAccount.collectAsState(initial = null)
 
-    val accounts = remember {
-        listOf(
-            BankAccount(
-                accountNumber = user?.accountNumber ?: "FR76 3000 1007 1600 0000 0000 123",
-                accountName = "Compte Courant",
-                balance = user?.balance ?: 1250.50,
-                color = Color(0xFF6200EE)
-            ),
-            BankAccount(
-                accountNumber = "FR76 3000 1007 1600 0000 0000 456",
-                accountName = "Livret A",
-                balance = 5000.0,
-                color = Color(0xFF03DAC5)
-            ),
-            BankAccount(
-                accountNumber = "FR76 3000 1007 1600 0000 0000 789",
-                accountName = "PEL",
-                balance = 15000.0,
-                color = Color(0xFFFF6B6B)
-            )
-        )
+    val displayedAccounts = remember(accounts, currentAccount) {
+        val currentId = currentAccount?.id
+        buildList {
+            currentAccount?.let { add(it) }
+            addAll(accounts.filter { !it.id.isNullOrBlank() && it.id != currentId })
+        }
+    }
+
+    var showCreateAccountDialog by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf<BankAccount.AccountType?>(null) }
+    var initialDepositInput by remember { mutableStateOf("") }
+    
+    LaunchedEffect(Unit) {
+        viewModel.loadUserData()
     }
     
     Column(
@@ -56,19 +53,36 @@ fun WalletScreen(viewModel: BankViewModel) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Mes comptes",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Mes comptes",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            TextButton(onClick = { showCreateAccountDialog = true }) {
+                Text("Souscrire")
+            }
+        }
         
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(accounts) { account ->
-                AccountCard(account = account)
+            items(
+                items = displayedAccounts,
+                key = { account -> account.id ?: account.accountNumber }
+            ) { account ->
+                AccountCard(
+                    account = account,
+                    onClick = { onAccountClick(account) }
+                )
             }
         }
         
@@ -119,7 +133,7 @@ fun WalletScreen(viewModel: BankViewModel) {
                 Spacer(modifier = Modifier.weight(1f))
                 
                 Text(
-                    text = user?.name?.uppercase() ?: "JOHN DOE",
+                    text = viewModel.uiState.value.user?.name?.uppercase() ?: "JOHN DOE",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -146,14 +160,117 @@ fun WalletScreen(viewModel: BankViewModel) {
             }
         }
     }
+
+    if (showCreateAccountDialog) {
+        val availableTypes = remember(accounts) {
+            listOf(
+                BankAccount.AccountType.LIVRET_A,
+                BankAccount.AccountType.LIVRET_JEUNE,
+                BankAccount.AccountType.PEL
+            ).filter { type -> accounts.none { it.type == type } }
+        }
+
+        if (selectedType == null && availableTypes.isNotEmpty()) {
+            selectedType = availableTypes.first()
+        }
+
+        AlertDialog(
+            onDismissRequest = {
+                showCreateAccountDialog = false
+                selectedType = null
+                initialDepositInput = ""
+            },
+            title = { Text("Souscrire à un compte") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (availableTypes.isEmpty()) {
+                        Text("Tous les comptes d'épargne disponibles sont déjà ouverts.")
+                    } else {
+                        var expanded by remember { mutableStateOf(false) }
+
+                        OutlinedButton(
+                            onClick = { expanded = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = selectedType?.name ?: "Choisir un type",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            availableTypes.forEach { type ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        selectedType = type
+                                        expanded = false
+                                    },
+                                    text = { Text(type.name) }
+                                )
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = initialDepositInput,
+                            onValueChange = { initialDepositInput = it },
+                            label = { Text("Dépôt initial (optionnel)") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = availableTypes.isNotEmpty() && selectedType != null,
+                    onClick = {
+                        val deposit = initialDepositInput
+                            .replace(',', '.')
+                            .toDoubleOrNull() ?: 0.0
+
+                        val type = selectedType
+                        if (type != null) {
+                            viewModel.createAccount(type = type, initialBalance = deposit)
+                        }
+
+                        showCreateAccountDialog = false
+                        selectedType = null
+                        initialDepositInput = ""
+                    }
+                ) {
+                    Text("Créer")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showCreateAccountDialog = false
+                        selectedType = null
+                        initialDepositInput = ""
+                    }
+                ) {
+                    Text("Annuler")
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AccountCard(account: BankAccount) {
+private fun AccountCard(
+    account: BankAccount,
+    onClick: () -> Unit
+) {
     Card(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = account.color.copy(alpha = 0.1f)
         )
@@ -205,11 +322,4 @@ private fun AccountCard(account: BankAccount) {
             )
         }
     }
-}
-
-private fun formatCurrency(amount: Double): String {
-    val format = NumberFormat.getCurrencyInstance(Locale.FRANCE)
-    format.maximumFractionDigits = 2
-    format.currency = Currency.getInstance("EUR")
-    return format.format(amount)
 }
