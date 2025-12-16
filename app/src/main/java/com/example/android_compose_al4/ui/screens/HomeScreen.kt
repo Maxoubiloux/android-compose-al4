@@ -3,11 +3,13 @@ package com.example.android_compose_al4.ui.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -23,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.android_compose_al4.viewmodel.BankViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +44,7 @@ fun HomeScreen(
     val items = listOf(
         Screen.Home,
         Screen.Wallet,
+        Screen.Transfer,
         Screen.Map,
         Screen.Profile
     )
@@ -87,11 +92,32 @@ fun HomeScreen(
                             navController.navigate(Screen.History.route) {
                                 launchSingleTop = true
                             }
+                        },
+                        onNavigateToTransfer = {
+                            navController.navigate(Screen.Transfer.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     ) 
                 }
                 composable(Screen.Wallet.route) { 
-                    WalletScreen(viewModel = viewModel) 
+                    WalletScreen(
+                        viewModel = viewModel,
+                        onAccountClick = { account ->
+                            val id = account.id
+                            if (!id.isNullOrBlank()) {
+                                navController.navigate("account/$id") {
+                                    launchSingleTop = true
+                                }
+                            } else {
+                                viewModel.showUiMessage("Impossible d'ouvrir ce compte: identifiant manquant")
+                            }
+                        }
+                    )
                 }
                 
                 composable(Screen.History.route) {
@@ -105,6 +131,26 @@ fun HomeScreen(
                 }
                 composable(Screen.Profile.route) { 
                     ProfileScreen(viewModel = viewModel)
+                }
+                composable(Screen.Transfer.route) {
+                    TransferScreen(
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                composable(
+                    route = Screen.AccountDetail.route,
+                    arguments = listOf(navArgument("accountId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val accountId = backStackEntry.arguments?.getString("accountId")
+                    if (!accountId.isNullOrBlank()) {
+                        AccountDetailScreen(
+                            viewModel = viewModel,
+                            accountId = accountId,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
 
@@ -129,17 +175,19 @@ sealed class Screen(
 ) {
     object Home : Screen("home", "Accueil", Icons.Default.Home)
     object Wallet : Screen("wallet", "Portefeuille", Icons.Default.Payment)
+    object Transfer : Screen("transfer", "Virement", Icons.Default.SwapHoriz)
     object Map : Screen("map", "Carte", Icons.Default.Map)
     object Profile : Screen("profile", "Profil", Icons.Default.AccountCircle)
     object History : Screen("history", "Historique")
+    object AccountDetail : Screen("account/{accountId}", "Compte")
 }
 
 sealed class UiEvent {
     object NavigateToHome : UiEvent()
     object NavigateToWallet : UiEvent()
+    object NavigateToTransfer : UiEvent()
     object NavigateToMap : UiEvent()
     object NavigateToProfile : UiEvent()
     data class ShowError(val message: String) : UiEvent()
     data class ShowMessage(val message: String) : UiEvent()
 }
-

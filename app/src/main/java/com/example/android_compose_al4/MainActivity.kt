@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.android_compose_al4.ui.screens.HomeScreen
 import com.example.android_compose_al4.ui.screens.LoginScreen
@@ -20,7 +19,6 @@ import com.example.android_compose_al4.ui.theme.Androidcomposeal4Theme
 import com.example.android_compose_al4.viewmodel.BankUiEvent
 import com.example.android_compose_al4.viewmodel.BankViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
@@ -44,7 +42,7 @@ fun BankApp() {
         val navController = rememberNavController()
         
 
-        val viewModel: BankViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+        val viewModel: BankViewModel = androidx.hilt.navigation.compose.hiltViewModel()
         
 
         LaunchedEffect(key1 = true) {
@@ -82,7 +80,8 @@ fun BankApp() {
                 composable("home") {
                     HomeScreen(
                         snackbarHostState = snackbarHostState,
-                        onEvent = { }
+                        onEvent = { },
+                        viewModel = viewModel
                     )
                 }
             }
