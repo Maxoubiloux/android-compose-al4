@@ -3,7 +3,7 @@
     {
       "id": "1",
       "title": "Salaire",
-      "amount": 2500.00,
+      "amount": 2500,
       "date": "2025-01-31T12:00:00",
       "category": {
         "id": 5,
@@ -11,7 +11,8 @@
         "icon": "account_balance_wallet",
         "color": "#FFEEAD"
       },
-      "type": "INCOME"
+      "type": "INCOME",
+      "accountId": "account1"
     },
     {
       "id": "2",
@@ -24,12 +25,13 @@
         "icon": "restaurant",
         "color": "#FF6B6B"
       },
-      "type": "EXPENSE"
+      "type": "EXPENSE",
+      "accountId": "account1"
     },
     {
       "id": "3",
       "title": "Essence",
-      "amount": -45.20,
+      "amount": -45.2,
       "date": "2025-02-16T09:15:00",
       "category": {
         "id": 2,
@@ -37,12 +39,13 @@
         "icon": "directions_car",
         "color": "#4ECDC4"
       },
-      "type": "EXPENSE"
+      "type": "EXPENSE",
+      "accountId": "account1"
     },
     {
       "id": "4",
       "title": "Cadeau d'anniversaire",
-      "amount": -120.00,
+      "amount": -120,
       "date": "2025-02-18T14:20:00",
       "category": {
         "id": 3,
@@ -50,12 +53,13 @@
         "icon": "shopping_bag",
         "color": "#45B7D1"
       },
-      "type": "EXPENSE"
+      "type": "EXPENSE",
+      "accountId": "account1"
     },
     {
       "id": "5",
       "title": "Remboursement",
-      "amount": 35.50,
+      "amount": 35.5,
       "date": "2025-02-20T16:45:00",
       "category": {
         "id": 6,
@@ -63,6 +67,175 @@
         "icon": "more_horiz",
         "color": "#FFD166"
       },
+      "type": "INCOME",
+      "accountId": "account1"
+    },
+    {
+      "id": "6",
+      "title": "Virement reçu",
+      "amount": 500,
+      "date": "2025-02-21T09:30:00",
+      "category": {
+        "id": 6,
+        "name": "Autre",
+        "icon": "more_horiz",
+        "color": "#FFD166"
+      },
+      "type": "INCOME",
+      "accountId": "account2"
+    },
+    {
+      "id": "7",
+      "title": "Virement émis",
+      "amount": -200,
+      "date": "2025-02-21T09:30:00",
+      "category": {
+        "id": 6,
+        "name": "Autre",
+        "icon": "more_horiz",
+        "color": "#FFD166"
+      },
+      "type": "EXPENSE",
+      "accountId": "account1"
+    },
+    {
+      "id": "e065",
+      "accountId": "account1",
+      "amount": -300,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 15:43:43 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "1d98",
+      "accountId": "account2",
+      "amount": 300,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 15:43:43 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "INCOME"
+    },
+    {
+      "id": "ab69",
+      "accountId": "account1",
+      "amount": -18.55,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:04:23 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "5460",
+      "accountId": "account2",
+      "amount": 18.55,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:04:23 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "INCOME"
+    },
+    {
+      "id": "1c41",
+      "accountId": "account2",
+      "amount": -200,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:17:48 GMT+01:00 2025",
+      "title": "Virement Livret A → Compte Courant",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "ab94",
+      "accountId": "account1",
+      "amount": 200,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:17:48 GMT+01:00 2025",
+      "title": "Virement Livret A → Compte Courant",
+      "type": "INCOME"
+    },
+    {
+      "id": "fc24",
+      "accountId": "account1",
+      "amount": -100,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:18:47 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "fa48",
+      "accountId": "account2",
+      "amount": 100,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Sun Dec 14 23:18:47 GMT+01:00 2025",
+      "title": "Virement Compte Courant → Livret A",
+      "type": "INCOME"
+    },
+    {
+      "id": "9b76",
+      "accountId": "account2",
+      "amount": -84.55,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Mon Dec 15 14:54:58 GMT+01:00 2025",
+      "title": "Virement Livret A → Compte Courant",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "c231",
+      "accountId": "account1",
+      "amount": 84.55,
+      "category": {
+        "color": "#9C27B0",
+        "icon": "swap_horiz",
+        "id": 7,
+        "name": "Virement"
+      },
+      "date": "Mon Dec 15 14:54:58 GMT+01:00 2025",
+      "title": "Virement Livret A → Compte Courant",
       "type": "INCOME"
     }
   ],
@@ -79,7 +252,46 @@
   "users": [
     {
       "email": "jean.dupont@example.com",
-      "password": "demo123"
+      "password": "demo123",
+      "id": "7f17"
+    }
+  ],
+  "accounts": [
+    {
+      "id": "account1",
+      "accountNumber": "FR76 3000 1007 1600 0000 0000 123",
+      "accountName": "Compte Courant",
+      "balance": 2684.55,
+      "type": "CURRENT_ACCOUNT",
+      "currency": "EUR",
+      "color": "#6200EE"
+    },
+    {
+      "id": "account2",
+      "accountNumber": "FR76 3000 1007 1600 0000 0000 456",
+      "accountName": "Livret A",
+      "balance": 5100,
+      "type": "LIVRET_A",
+      "currency": "EUR",
+      "color": "#03A9F4"
+    },
+    {
+      "id": "account3",
+      "accountNumber": "FR76 3000 1007 1600 0000 0000 321",
+      "accountName": "Livret Jeune",
+      "balance": 1500,
+      "type": "LIVRET_JEUNE",
+      "currency": "EUR",
+      "color": "#FF9800"
+    },
+    {
+      "id": "account4",
+      "accountNumber": "FR76 3000 1007 1600 0000 0000 654",
+      "accountName": "PEL",
+      "balance": 10000,
+      "type": "PEL",
+      "currency": "EUR",
+      "color": "#9C27B0"
     }
   ]
 }
