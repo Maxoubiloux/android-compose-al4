@@ -53,7 +53,7 @@ class BankRepositoryImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emit(emptyList())
         }
     }
@@ -161,7 +161,7 @@ class BankRepositoryImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emit(emptyList())
         }
     }
@@ -177,7 +177,7 @@ class BankRepositoryImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emit(null)
         }
     }
@@ -253,7 +253,7 @@ class BankRepositoryImpl @Inject constructor(
                 else -> data.profiles?.firstOrNull()
             }
             profile?.toUser()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

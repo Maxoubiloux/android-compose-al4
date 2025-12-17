@@ -24,7 +24,7 @@ object AuthProvider {
                 val content = reader.readText()
                 Gson().fromJson(content, MockAuthData::class.java)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

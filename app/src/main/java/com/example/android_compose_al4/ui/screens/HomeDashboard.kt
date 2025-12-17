@@ -210,7 +210,7 @@ private fun parseTransactionDateOrNow(raw: String): Date {
     if (iso != null) return iso
 
     val javaDateToString = try {
-        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).parse(raw)
+        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.FRANCE).parse(raw)
     } catch (_: Exception) {
         null
     }
