@@ -79,14 +79,11 @@ fun HomeDashboard(
                         icon = Icons.AutoMirrored.Filled.ArrowForward,
                         onClick = onNavigateToTransfer
                     )
-                    ActionButton(
-                        text = "Dépenser",
-                        icon = Icons.Default.Payment,
-                        onClick = { }
-                    )
                 }
             }
         }
+
+        
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -130,8 +127,8 @@ fun HomeDashboard(
 
     if (showAddTransactionDialog) {
         AddTransactionDialog(
-            onDismiss = onDismissDialog,
-            onConfirm = onDismissDialog
+            viewModel = viewModel,
+            onDismiss = onDismissDialog
         )
     }
 }
@@ -172,17 +169,47 @@ private fun ActionButton(
 
 @Composable
 private fun AddTransactionDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    viewModel: BankViewModel,
+    onDismiss: () -> Unit
 ) {
+    var title by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var isExpense by remember { mutableStateOf(true) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Ajouter une transaction") },
         text = {
-            Text("Formulaire d'ajout de transaction à implémenter")
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Titre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Montant") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(if (isExpense) "Type: Dépense" else "Type: Revenu")
+                    Switch(checked = isExpense, onCheckedChange = { isExpense = it })
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(onClick = {
+                viewModel.addSimpleTransaction(title, amount, isExpense)
+                onDismiss()
+            }) {
                 Text("Ajouter")
             }
         },

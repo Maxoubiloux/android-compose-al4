@@ -480,6 +480,69 @@ class BankViewModel @Inject constructor(
         }
     }
 
+    fun addSimpleTransaction(
+        title: String,
+        amountInput: String,
+        isExpense: Boolean
+    ) {
+        val normalized = amountInput.replace(',', '.')
+        val amount = normalized.toDoubleOrNull()
+        if (title.isBlank()) {
+            showMessage("Veuillez saisir un titre")
+            return
+        }
+        if (amount == null || amount <= 0.0) {
+            showMessage("Veuillez saisir un montant valide (> 0)")
+            return
+        }
+
+        val signedAmount = if (isExpense) -amount else amount
+        val accountId = currentAccount.value?.id
+        val tx = Transaction(
+            title = title,
+            amount = signedAmount,
+            date = Date().toString(),
+            category = transactionCategories.last(),
+            accountId = accountId
+        )
+
+        viewModelScope.launch {
+            try {
+                val result = repository.addTransaction(tx).first()
+                if (result.isSuccess) {
+                    val persisted = result.getOrNull() ?: tx
+                    _uiState.value = _uiState.value.copy(
+                        transactions = _uiState.value.transactions + persisted
+                    )
+                    showMessage("Transaction ajoutée")
+                    loadTransactions()
+                } else {
+                    throw (result.exceptionOrNull() ?: Exception("Échec d'ajout"))
+                }
+            } catch (e: Exception) {
+                showMessage("Erreur: ${e.message}")
+            }
+        }
+    }
+
+    fun updateUserProfile(name: String, email: String, phone: String) {
+        val current = _uiState.value.user ?: return
+        val updated = current.copy(name = name, email = email, phone = phone)
+        viewModelScope.launch {
+            try {
+                val result = repository.updateUserProfile(updated).first()
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(user = result.getOrNull() ?: updated)
+                    showMessage("Profil mis à jour")
+                } else {
+                    showMessage("Échec de la mise à jour du profil")
+                }
+            } catch (e: Exception) {
+                showMessage("Erreur lors de l'enregistrement: ${e.message}")
+            }
+        }
+    }
+
     private fun showMessage(message: String) {
         viewModelScope.launch {
             _events.emit(BankUiEvent.ShowMessage(message))

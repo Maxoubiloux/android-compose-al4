@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,6 +24,18 @@ android {
         versionName = "1.0"
 
         buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000/\"")
+
+        val mapsApiKeyFromGradle = providers.gradleProperty("MAPS_API_KEY").orNull
+        val mapsApiKeyFromLocal = run {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) {
+                val props = Properties()
+                f.inputStream().use { props.load(it) }
+                props.getProperty("MAPS_API_KEY")
+            } else null
+        }
+        val mapsApiKey = mapsApiKeyFromGradle ?: mapsApiKeyFromLocal ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -67,6 +81,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)

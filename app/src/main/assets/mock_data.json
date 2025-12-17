@@ -237,6 +237,34 @@
       "date": "Mon Dec 15 14:54:58 GMT+01:00 2025",
       "title": "Virement Livret A → Compte Courant",
       "type": "INCOME"
+    },
+    {
+      "id": "085d",
+      "accountId": "account1",
+      "amount": -120,
+      "category": {
+        "color": "#FFD166",
+        "icon": "more_horiz",
+        "id": 6,
+        "name": "Autre"
+      },
+      "date": "Wed Dec 17 10:26:45 GMT+01:00 2025",
+      "title": "Essence",
+      "type": "EXPENSE"
+    },
+    {
+      "id": "601b",
+      "accountId": "account1",
+      "amount": 220,
+      "category": {
+        "color": "#FFD166",
+        "icon": "more_horiz",
+        "id": 6,
+        "name": "Autre"
+      },
+      "date": "Wed Dec 17 10:27:17 GMT+01:00 2025",
+      "title": "Remboursment ESGI",
+      "type": "INCOME"
     }
   ],
   "profiles": [

@@ -26,6 +26,7 @@ import javax.inject.Singleton
 interface BankRepository {
     suspend fun getTransactions(): Flow<List<Transaction>>
     suspend fun getUserProfile(): Flow<User?>
+    suspend fun updateUserProfile(user: User): Flow<Result<User>>
     suspend fun addTransaction(transaction: Transaction): Flow<Result<Transaction>>
     suspend fun deleteTransaction(transactionId: String): Flow<Result<Boolean>>
     suspend fun updateAccounts(accounts: List<BankAccount>): Flow<Result<Unit>>
@@ -61,20 +62,31 @@ class BankRepositoryImpl @Inject constructor(
     override suspend fun getUserProfile(): Flow<User?> = flow {
         try {
             val email = SessionManager.currentEmail
-            val response = apiService.getProfiles(email = email)
-            if (response.isSuccessful) {
-                val profile = response.body()?.firstOrNull()
-                if (profile != null) {
-                    emit(profile.toUser())
-                    return@flow
-                }
-            }
+            val base: User? = try {
+                val response = apiService.getProfiles(email = email)
+                if (response.isSuccessful) {
+                    response.body()?.firstOrNull()?.toUser()
+                } else null
+            } catch (_: Exception) { null }
+
+            val fallback = base ?: loadUserFromAssets() ?: createDummyUser()
+            val (nameOverride, emailOverride, phoneOverride) = readProfileOverrides()
+            val merged = fallback.copy(
+                name = nameOverride ?: fallback.name,
+                email = emailOverride ?: fallback.email,
+                phone = phoneOverride ?: fallback.phone
+            )
+            emit(merged)
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
+            emit(null)
         }
-        val user = loadUserFromAssets()
-        emit(user ?: createDummyUser())
+    }
+
+    override suspend fun updateUserProfile(user: User): Flow<Result<User>> = flow {
+        saveProfileOverrides(user.name, user.email, user.phone)
+        emit(Result.success(user))
     }
     
     override suspend fun addTransaction(transaction: Transaction): Flow<Result<Transaction>> = flow {
@@ -304,4 +316,22 @@ class BankRepositoryImpl @Inject constructor(
     private data class MockDataProfiles(
         @SerializedName("profiles") val profiles: List<UserResponse>? = null
     )
+
+    private fun prefs() = appContext.getSharedPreferences("bank_prefs", Context.MODE_PRIVATE)
+
+    private fun readProfileOverrides(): Triple<String?, String?, String?> {
+        val p = prefs()
+        val name = p.getString("user_name", null)
+        val email = p.getString("user_email", null)
+        val phone = p.getString("user_phone", null)
+        return Triple(name, email, phone)
+    }
+
+    private fun saveProfileOverrides(name: String, email: String, phone: String) {
+        prefs().edit()
+            .putString("user_name", name)
+            .putString("user_email", email)
+            .putString("user_phone", phone)
+            .apply()
+    }
 }

@@ -28,6 +28,7 @@ import com.example.android_compose_al4.viewmodel.BankViewModel
 fun ProfileScreen(viewModel: BankViewModel) {
     val uiState = viewModel.uiState.value
     val user = uiState.user
+    var showEditProfileDialog by remember { mutableStateOf(false) }
     
     Column(
         modifier = Modifier
@@ -110,7 +111,7 @@ fun ProfileScreen(viewModel: BankViewModel) {
                 ProfileMenuItem(
                     icon = Icons.Default.Person,
                     title = "Informations personnelles",
-                    onClick = {}
+                    onClick = { showEditProfileDialog = true }
                 )
                 
                 ProfileMenuItem(
@@ -211,7 +212,72 @@ fun ProfileScreen(viewModel: BankViewModel) {
                 )
             }
         }
+
+        if (showEditProfileDialog) {
+            EditProfileDialog(
+                initialName = user?.name ?: "",
+                initialEmail = user?.email ?: "",
+                initialPhone = user?.phone ?: "",
+                onDismiss = { showEditProfileDialog = false },
+                onSave = { name, email, phone ->
+                    viewModel.updateUserProfile(name, email, phone)
+                    showEditProfileDialog = false
+                }
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditProfileDialog(
+    initialName: String,
+    initialEmail: String,
+    initialPhone: String,
+    onDismiss: () -> Unit,
+    onSave: (String, String, String) -> Unit
+) {
+    var name by remember { mutableStateOf(initialName) }
+    var email by remember { mutableStateOf(initialEmail) }
+    var phone by remember { mutableStateOf(initialPhone) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Modifier le profil") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nom") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Téléphone") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onSave(name, email, phone) }) {
+                Text("Enregistrer")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Annuler") }
+        }
+    )
 }
 
 @Composable
